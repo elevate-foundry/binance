@@ -8,8 +8,15 @@ import psycopg2
 import datetime
 import time
 import math
-from datetime import datetime
+import os
+import boto3
+import requests
 import pandas as pd
+import numpy as np
+import datetime
+from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
+from binance.client import Client
+from sqlalchemy import create_engine
 
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.max_rows', 3000)
@@ -35,35 +42,24 @@ def query_redshift(sql):
    print('Seconds taken: %s' % time_passed.total_seconds())
    return pd.DataFrame(results_query, columns=results_colnames)
 
-AWS_KEY = "AKIAW5TFIVP5MY3DD44R"
-AWS_SECRET = "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"
+AWS_KEY = os.environ['AWS_KEY']
+AWS_SECRET = os.environ['AWS_SECRET']
 REGION_NAME = 'us-east-2'
 
 # Dallin Binance API/Secret
-dallin_binance_key = "TVD1AV0EfD1fVXwxpSYcjo4svuGMbTnBRd8VhyhEz3wam1wPJBAf4fEGBndMxuCt"
-dallin_binance_secret = "zNPDZrZjH7ZUZHjHIuCEmZ0kLNaK2pEpRsVA1JBokPIipFq7wPOsRrrqtcJgbcje"
+dallin_binance_key = os.environ['DALLIN_BINANCE_KEY']
+dallin_binance_secret = os.environ['DALLIN_BINANCE_SECRET']
 
-ryan_binance_key = "TVD1AV0EfD1fVXwxpSYcjo4svuGMbTnBRd8VhyhEz3wam1wPJBAf4fEGBndMxuCt"
-ryan_binance_secret = "Je2K9BSxkn7fVwMdd03aFvsRFBTxiHbKizLuwGLQPTNVommT914tI3TSpV2B8Z07"
-
-import boto3
-import requests
-import pandas as pd
-import numpy as np
-import datetime
-import time
-from binance import Client, ThreadedWebsocketManager, ThreadedDepthCacheManager
-from binance.client import Client
-from sqlalchemy import create_engine
+ryan_binance_key = os.environ['RYAN_BINANCE_KEY']
+ryan_binance_secret = os.environ['RYAN_BINANCE_SECRET']
 
 client = Client(dallin_binance_key,dallin_binance_secret,tld='us')
 session = boto3.Session(aws_access_key_id = AWS_KEY,aws_secret_access_key = AWS_SECRET,region_name = REGION_NAME)
 s3 = session.resource('s3')
 
 info = []
-intervals = 10
 time_res = []
-for i in range(intervals):
+while True:
     created_at = datetime.datetime.now()
     time_res = client.get_server_time()
     timestamp = (datetime.datetime(1970,1,1,0,0,0) 
@@ -105,189 +101,4 @@ for i in range(intervals):
 
     df.to_sql('binance', conn, index=False, if_exists='append')
 
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[88]:
-
-
-
-
-
-# In[92]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[43]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[350]:
-
-
-
-
-
-# In[347]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[208]:
-
-
-
-
-
-# In[135]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[41]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[135]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[99]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[125]:
-
-
-
-
-
-# In[137]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
+    time.sleep(60)
