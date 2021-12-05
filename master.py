@@ -101,4 +101,4 @@ while True:
 
     df.to_sql('binance', conn, index=False, if_exists='append')
 
-    time.sleep(60)
+    time.sleep(0.333)
